@@ -13,7 +13,18 @@ This repository provides the necessary udev rules to facilitate this interaction
 ### Prerequisites
 
 - A Linux-based operating system, that supports udev (almost any modern distro will)
-- A Finalmouse ULX, Falcon module or Centerpiece Pro device.
+- A supported Finalmouse device (see [Supported devices](#supported-devices)).
+
+### Supported devices
+
+| Device | USB IDs (`361d:xxxx`) |
+| --- | --- |
+| ULX / Falcon module | `0100`–`0104`, `0111` |
+| Centerpiece Pro | `0200`–`0203` (+ `1fc9:0021`) |
+| StarlightX (SLX) dongle | `0300`, `0302` (bootloader) |
+| StarlightX (SLX) mouse | `0310`, `0312` (bootloader) |
+
+The SLX bootloaders show up as a USB serial (CDC-ACM) port rather than a HID device, so the rules also grant access to that serial port and tell ModemManager to leave it alone. No `dialout`/`uucp` group membership is needed.
 
 ### Steps
 
@@ -36,6 +47,7 @@ This repository provides the necessary udev rules to facilitate this interaction
    ```bash
    sudo udevadm control --reload-rules && sudo udevadm trigger
    ```
+   Then unplug and replug your device (including the dongle).
 
 5. **Verify Installation:**
    Connect your Finalmouse device and verify if it's detected correctly by the [XPANEL](https://xpanel.finalmouse.com) application.
@@ -44,6 +56,18 @@ This repository provides the necessary udev rules to facilitate this interaction
 
 Once installed, the udev rules will automatically set the correct permissions for your Finalmouse devices.
 This allows the [XPANEL](https://xpanel.finalmouse.com) web application to detect and interact with your device without requiring additional configurations.
+
+If you installed an older version of this file, copy it again to pick up newly supported devices.
+
+## Troubleshooting
+
+- Make sure the file is named `70-finalmouse.rules` (or anything sorting before `73`). `TAG+="uaccess"` has no effect in files sorted later, such as `99-...`.
+- Check that your user got access (look for a `user:<you>:rw-` line):
+  ```bash
+  getfacl /dev/hidraw*            # mouse / dongle
+  getfacl /dev/ttyACM*            # SLX bootloader
+  ```
+- `uaccess` only applies to users with an active local session; it doesn't apply over SSH.
 
 ---
 
