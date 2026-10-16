@@ -1,4 +1,5 @@
-# This file should be installed to /etc/udev/rules.d so that you can access the Finalmouse ULX devices without being root.
+# This file should be installed to /etc/udev/rules.d so that you can access Finalmouse devices without being root.
+# The 70- prefix matters: TAG+="uaccess" is only honoured by rules sorted before 73-seat-late.rules.
 #
 # type this at the command prompt: sudo cp 70-finalmouse.rules /etc/udev/rules.d
 
@@ -29,3 +30,25 @@ SUBSYSTEM=="hidraw", ATTRS{idVendor}=="361d", ATTRS{idProduct}=="0202", MODE="06
 SUBSYSTEM=="hidraw", ATTRS{idVendor}=="361d", ATTRS{idProduct}=="0203", MODE="0660", TAG+="uaccess"
 SUBSYSTEM=="hidraw", ATTRS{idVendor}=="1fc9", ATTRS{idProduct}=="0021", MODE="0660", TAG+="uaccess"
 
+# Finalmouse StarlightX (SLX) devices
+#   0300 = dongle, 0302 = dongle bootloader (MCUboot serial recovery)
+#   0310 = mouse,  0312 = mouse bootloader (MCUboot serial recovery)
+
+# Finalmouse SLX devices - USB access
+SUBSYSTEM=="usb", ATTR{idVendor}=="361d", ATTR{idProduct}=="0300", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTR{idVendor}=="361d", ATTR{idProduct}=="0301", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTR{idVendor}=="361d", ATTR{idProduct}=="0302", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTR{idVendor}=="361d", ATTR{idProduct}=="0310", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTR{idVendor}=="361d", ATTR{idProduct}=="0311", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="usb", ATTR{idVendor}=="361d", ATTR{idProduct}=="0312", MODE="0660", TAG+="uaccess"
+
+# Finalmouse SLX devices - HID access
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="361d", ATTRS{idProduct}=="0300", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="361d", ATTRS{idProduct}=="0301", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="361d", ATTRS{idProduct}=="0310", MODE="0660", TAG+="uaccess"
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="361d", ATTRS{idProduct}=="0311", MODE="0660", TAG+="uaccess"
+
+# Finalmouse SLX devices - serial (CDC-ACM) access: bootloaders, plus debug builds with a USB shell.
+# ID_MM_DEVICE_IGNORE keeps ModemManager from probing the port with AT commands.
+SUBSYSTEM=="tty", ATTRS{idVendor}=="361d", ATTRS{idProduct}=="030[0-2]", MODE="0660", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="361d", ATTRS{idProduct}=="031[0-2]", MODE="0660", TAG+="uaccess", ENV{ID_MM_DEVICE_IGNORE}="1"
